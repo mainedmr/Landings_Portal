@@ -1,3 +1,14 @@
+# Load/install packages
+if (!require("pacman")) install.packages("pacman")
+library(pacman)
+p_load(tidyverse)
+
+# Set wd as location of script if user is using RStudio, else set it to a temp dir
+if (rstudioapi::isAvailable()) {
+  setwd(dirname(rstudioapi::getActiveDocumentContext()$path))
+} else setwd(tempdir())
+
+
 # Input CSV file
 input_csv <- "landings_new.csv"
 
@@ -28,4 +39,6 @@ landings <- readr::read_csv(input_csv) %>%
 # Save file
 save(landings, file = "landings.Rda")
 
-# Then upload the output landings.Rda file to the GitHub repo
+# Then upload the output landings.Rda file to the GitHub repo; for convenience,
+# the output folder is opened
+shell(paste0("explorer ", normalizePath(getwd())), intern = T) 
