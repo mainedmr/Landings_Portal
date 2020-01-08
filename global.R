@@ -18,7 +18,7 @@ devtools::source_url(paste0(base_url, "settings.R"))
 
 
 # List of variables for selectors
-vars_species <- sort(unique(landings$species))
+vars_species <- sort(c(unique(landings$species), "Coconut Crab"))
 vars_years <- sort(unique(landings$year))
 vars_ports <- sort(unique(landings$port))
 vars_lob_zones <- sort(unique(landings$lob_zone))

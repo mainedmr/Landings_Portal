@@ -37,6 +37,29 @@ shinyServer(function(input, output, session) {
       }
     }
   })
+  # Tamatoa lies in wait....
+  tamatoa <- F
+  observeEvent({input$gbl_ports 
+                input$gbl_species}, {
+    if (
+      "Southport" %in% input$gbl_ports & "Coconut Crab" %in% input$gbl_species &
+      !tamatoa
+    ) 
+    {
+      shinyalert(title = "Shiiiiinnny!!!", 
+                text = "Well, Tamatoa hasn't always been this glam\n
+                I was a drab little crab once\n
+                Now I know I can be happy as a clam\n
+                Because I'm beautiful, baby.", 
+                 type = "info",
+                closeOnClickOutside = T,
+                 imageHeight = 100,
+                 imageUrl = "https://vignette.wikia.nocookie.net/disney/images/c/c5/Profile_-_Tamatoa.jpeg/revision/latest?cb=20190627030539"
+                 )
+      tamatoa <<- T
+    }
+  })
+  
   
   ## Observe selectors
   fil_ports <- reactive({

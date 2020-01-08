@@ -1,11 +1,14 @@
 library(shiny)
 library(shinyjs)
+library(shinyalert)
 
 shinyUI(
   fluidPage(
     #theme = "bootstrap.css",
     # Turn on shinyjs for user authentication
     shinyjs::useShinyjs(),
+    # Turn on shiny alert
+    useShinyalert(),
     # If using Google Analytics
     #tags$head(includeScript("www/google-analytics.js")),
     # Data portal title
