@@ -2,7 +2,7 @@ library(shiny)
 library(shinyjs)
 library(shinyalert)
 
-shinyUI(
+shinyUI(function(req) {
   fluidPage(
     #theme = "bootstrap.css",
     # Turn on shinyjs for user authentication
@@ -11,6 +11,20 @@ shinyUI(
     useShinyalert(),
     # If using Google Analytics
     #tags$head(includeScript("www/google-analytics.js")),
+    ## Geolocation
+    tags$head(
+      # Load geolocation JS
+      tags$script(src = "geolocation.js")
+    ),
+    # https://github.com/rstudio/shiny/issues/141
+    div(style = "display: none;",
+        textInput("remote_addr", "remote_addr",
+                  if (!is.null(req[["HTTP_X_FORWARDED_FOR"]]))
+                    req[["HTTP_X_FORWARDED_FOR"]]
+                  else
+                    req[["REMOTE_ADDR"]]
+        )
+    ),
     # Data portal title
     fluidRow(h2(app_title, align = "center")),
     # Buttons to toggle on/off sidebar
@@ -140,4 +154,4 @@ shinyUI(
     ) # End main panel
   ) # End sidebar layout
   ) # End fluidPage
-) # End Shiny UI
+}) # End Shiny UI

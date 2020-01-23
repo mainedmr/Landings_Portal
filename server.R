@@ -2,6 +2,28 @@ library(shiny)
 library(glue)
 
 shinyServer(function(input, output, session) {
+  # When session first starts generate a guid
+  guid <- uuid::UUIDgenerate()
+  # Get IP info
+  ip <- reactive({
+    isolate(input$remote_addr)
+  })
+  # Then submit new session
+  #submit_event("new_session", "new_session", guid, ip = ip())
+  # This code will be run after the client has disconnected
+  session$onSessionEnded(function() {
+    #submit_event("end_session", "end_session", guid, ip = ip())
+  })
+  # React when a user agrees to geolocation and submit
+  observeEvent(input$geolocation, {
+    event_value <- ifelse(input$geolocation, "agreed", "denied")
+    #submit_event("geolocation", event_value, guid, 
+    #             ip = ip(), lat = input$lat, lon = input$long)
+  })
+  # React when tab is changed
+  observeEvent(input$tab_panel, {
+    #submit_event("tab_change", input$tab_panel, guid, ip = ip())
+  })
   ## This bit reacts when a tab is clicked and hides/shows the sidebar depending
   ## on the tab; ie, for the About and Data tab the sidebar is hidden
   # Session-wide boolean for side panel state
@@ -36,6 +58,8 @@ shinyServer(function(input, output, session) {
         sidebar_state <<- T
       }
     }
+    # Submit event
+    #submit_event("sidebar_state", ifelse(sidebar_state, "on", "off"), guid, ip = ip())
   })
   # Tamatoa lies in wait....
   tamatoa <- F
@@ -57,6 +81,8 @@ shinyServer(function(input, output, session) {
                  imageUrl = "https://vignette.wikia.nocookie.net/disney/images/c/c5/Profile_-_Tamatoa.jpeg/revision/latest?cb=20190627030539"
                  )
       tamatoa <<- T
+      # Submit event
+      #submit_event("tamatoa", "shiiiiny", guid, ip = ip())
     }
   })
   

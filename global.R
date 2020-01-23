@@ -16,6 +16,12 @@ load(url(data_url))
 # Source settings
 devtools::source_url(paste0(base_url, "settings.R"))
 
+# Source functions
+source("functions.R")
+
+# URL and access code for submitting traffic
+tracking_url <- "https://prod-14.usgovtexas.logic.azure.us:443/workflows/1970c31d0b304d30a931fd9f0076ce7b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=BSV1RXCCHuSz-THBarWxv7l5gNl4FLJAxZn1vEmYPJA"
+access_code <- "LfR3g79145*"
 
 # List of variables for selectors
 vars_species <- sort(c(unique(landings$species), "Coconut Crab"))
