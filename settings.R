@@ -14,7 +14,7 @@ unit_val <- "$"
 # Title for selectors panel
 selectors_title = h4("Filter data with the following selectors:")
 # Label for the port selector
-ports_label = h5("Ports:")
+ports_label = h4("Ports:")
 # Max number of ports to show in ports drop down
 ports_max_options = Inf
 # Max number of ports that can be selected by a user
