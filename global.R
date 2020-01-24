@@ -1,10 +1,12 @@
 library(shiny)
 library(shinyjs)
+library(shinyWidgets)
 library(tidyverse)
 library(ggplot2)
 library(scales)
 library(ggvis)
 library(glue)
+library(DT)
 
 # Base url to the GitHub repo with data and settings
 base_url <- "https://github.com/mainedmr/Landings_Portal/raw/master/"
@@ -19,9 +21,8 @@ devtools::source_url(paste0(base_url, "settings.R"))
 # Source functions
 source("functions.R")
 
-# URL and access code for submitting traffic
-tracking_url <- "https://prod-14.usgovtexas.logic.azure.us:443/workflows/1970c31d0b304d30a931fd9f0076ce7b/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=BSV1RXCCHuSz-THBarWxv7l5gNl4FLJAxZn1vEmYPJA"
-access_code <- "LfR3g79145*"
+# Set global table options
+options(DT.options = gbl_dt_options)
 
 # List of variables for selectors
 vars_species <- sort(c(unique(landings$species), "Coconut Crab"))
@@ -45,12 +46,9 @@ names(vars_series) <- c(glue("Total Weight ({unit_wt})"),
                         "Total Trips",
                         "Total Harvesters")
 
-### Functions
 
-# Returns name of a named vector item vs its value
-get_var_name <- function(vector, value) {
-  names(vector)[match(value, vector)]
-}
+
+
 
 
 

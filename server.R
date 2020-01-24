@@ -24,6 +24,14 @@ shinyServer(function(input, output, session) {
   observeEvent(input$tab_panel, {
     #submit_event("tab_change", input$tab_panel, guid, ip = ip())
   })
+  
+  ## Clear port and species selectors when buttons hit
+  observeEvent(input$rst_port, {
+    updateSelectizeInput(session, "gbl_ports", selected = character(0))
+  })
+  observeEvent(input$rst_species, {
+    updateSelectizeInput(session, "gbl_species", selected = character(0))
+  })
   ## This bit reacts when a tab is clicked and hides/shows the sidebar depending
   ## on the tab; ie, for the About and Data tab the sidebar is hidden
   # Session-wide boolean for side panel state
@@ -33,8 +41,7 @@ shinyServer(function(input, output, session) {
   observe({
     req(input$tab_panel)
     # Hide the sidebar panel when About or View Download is chosen
-    if (input$tab_panel == "about" | 
-        input$tab_panel == "tbls") {
+    if (input$tab_panel == "about") {
       shinyjs::hide(id = "div_sidebar")
       sidebar_state <<- F
     } else {
@@ -49,8 +56,7 @@ shinyServer(function(input, output, session) {
       shinyjs::hide(id = "div_sidebar")
       sidebar_state <<- F
     } else {
-      if (input$tab_panel == "about" | 
-          input$tab_panel == "tbls") {
+      if (input$tab_panel == "about") {
         shinyjs::hide(id = "div_sidebar")
         sidebar_state <<- F
       } else {
@@ -183,11 +189,15 @@ shinyServer(function(input, output, session) {
   })
   # Render plot title reactively
   output$plot_time_series_title <- renderUI({
-    title <- glue("{lab_series()}")
+    if (input$gbl_plot_tbl == "plot") {
+      title <- glue("{lab_series()}")
+    } else {
+      title <- "Tabular Data"
+    }
     if (input$gbl_group_plots != 'none') {
       title <- glue("{title} per {lab_group()}")
     }
-    title <- glue("{title} {input$gbl_year_range[1]} to \\
+    title <- glue("{title} per Year {input$gbl_year_range[1]} to \\
               {input$gbl_year_range[2]}")
     tagList(
       h4(title, align = "center"),
@@ -240,6 +250,47 @@ shinyServer(function(input, output, session) {
       readr::write_csv(ts_data(), con, na = "")
     }
   )
+  ## Render UI for table or plot
+  output$ts_page <- renderUI({
+    if (input$gbl_plot_tbl == "plot") {
+      tagList(
+        fluidRow(
+          # Time series plot of landings per year
+          ggvisOutput("plot_time_series"),
+          uiOutput("plot_time_series_ui")
+        )
+      )
+    } else {
+      tagList(
+        dataTableOutput("tbl_ts")
+      )
+    }
+  })
+  # Render table
+  output$tbl_ts <- renderDT(
+        datatable(ts_data(), rownames = F, 
+                  colnames = dt_col_labels(colnames(ts_data())),
+                    options = list(
+                      # Get the index of the column being plotted,
+                      # and order by year asc and order desc
+                      order = list(
+                        list(grep("year", colnames(ts_data())), "asc"),
+                        list(grep(input$gbl_plot_series, colnames(ts_data())), "desc")
+                      )
+                    )
+                    ) %>%
+          # Format currency column
+          formatCurrency(columns = grep(dt_cols$total_value$name, colnames(ts_data())),
+                         currency = unit_val,
+                         digits = digits_value) %>%
+          # Format weight column
+          formatRound(columns = grep(dt_cols$total_weight$name, colnames(ts_data())),
+                      digits = digits_weight) %>%
+          # Format trips/harvesters with comma
+          formatRound(columns = c(grep(dt_cols$total_trips$name, colnames(ts_data())),
+                                  grep(dt_cols$total_harvs$name, colnames(ts_data()))),
+                      digits = 0)
+                    )
   ## -------------------------------------------------------------------------
   ## Grouped variable panel
   ## -------------------------------------------------------------------------
@@ -276,6 +327,26 @@ shinyServer(function(input, output, session) {
                                          levels = d[[input$gbl_group_plots]])
     return(d)
   })
+  # Render plot title reactively
+  output$plot_gr_title <- renderUI({
+    req(input$gbl_group_plots != 'none')
+    if (input$gbl_plot_tbl == "plot") {
+      title <- glue("{lab_series()}")
+    } else {
+      title <- "Tabular Data"
+    }
+    title <- glue("{title} per {lab_group()}, \\
+                  {input$gbl_year_range[1]} to {input$gbl_year_range[2]}")
+    tagList(
+      h4(title, align = "center"),
+      h5(lab_ports(), align = "center"),
+      h5(lab_species(), align = "center"),
+      column(6, align = "center", offset = 3,
+         # Button to download the data
+         downloadButton("dl_gr", "Download selected data (CSV)")
+      )
+    )
+  })
   # Generate lollipop chart
   output$plot_group <- renderPlot({
     ggplot(gr_data(), aes(y = !!sym(input$gbl_group_plots), 
@@ -290,15 +361,55 @@ shinyServer(function(input, output, session) {
     ylab(lab_group()) +
     # Set x labels to comma separated
     scale_x_continuous(labels = scales::comma) +
-    # Build plot title
-    ggtitle(label = glue("{lab_series()} per {lab_group()}, \\
-                         {input$gbl_year_range[1]} to {input$gbl_year_range[2]}"),
-            subtitle = glue("{lab_ports()} \n {lab_species()}")
-            ) +
     # Set theme options
     gbl_theme
   })
-  ## -------------------------------------------------------------------------
-  ## Table View Panel
-  ## -------------------------------------------------------------------------  
+  ## Render UI for table or plot
+  output$grouped_page <- renderUI({
+    if (input$gbl_plot_tbl == "plot") {
+      tagList(
+        fluidRow(
+          # Lollipop chart of landings
+          plotOutput("plot_group", width = "auto", height = "600")
+        )
+      )
+    } else {
+      tagList(
+        dataTableOutput("tbl_gr")
+      )
+    }
+  })
+  # Render table
+  output$tbl_gr <- renderDT(
+                    datatable(gr_data(), rownames = F,
+                    colnames = dt_col_labels(colnames(gr_data())),
+                      options = list(
+                        order = list(
+                          # Get the index of the column being plotted and order desc
+                          list(grep(input$gbl_plot_series, colnames(gr_data())), "desc")
+                        )
+                      )
+                    ) %>%
+                    # Format currency column
+                    formatCurrency(columns = grep(dt_cols$total_value$name, colnames(gr_data())),
+                                   currency = unit_val,
+                                   digits = digits_value) %>%
+                    # Format weight column
+                    formatRound(columns = grep(dt_cols$total_weight$name, colnames(gr_data())),
+                                digits = digits_weight) %>%
+                    # Format trips/harvesters with comma
+                    formatRound(columns = c(grep(dt_cols$total_trips$name, colnames(gr_data())),
+                                            grep(dt_cols$total_harvs$name, colnames(gr_data()))),
+                                digits = 0)
+                  )
+  
+  # React to plot download clicks
+  output$dl_gr <- downloadHandler(
+    filename = function() {
+      paste0('MaineDMR_Landings_Grouped_Data_', Sys.Date(), '.csv')
+    },
+    content = function(con) {
+      readr::write_csv(gr_data(), con, na = "")
+    }
+  )
 }) # End shinyServer

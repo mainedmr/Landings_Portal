@@ -52,8 +52,13 @@ shinyUI(function(req) {
                 options = list(maxOptions = ports_max_options,
                                maxItems = ports_max_items,
                                placeholder = ports_placeholder,
+                               'plugins' = list('remove_button'),
                                onInitialize = I('function() { this.setValue(""); }')
                           )
+              ),
+              actionButton(
+                "rst_port",
+                label = "Clear Port Selection"
               )
             ),
             ## Species
@@ -67,15 +72,20 @@ shinyUI(function(req) {
                 options = list(maxOptions = species_max_options,
                                maxItems = species_max_items,
                                placeholder = species_placeholder,
+                               'plugins' = list('remove_button'),
                                onInitialize = I('function() { this.setValue(""); }')
                                )
+              ),
+              actionButton(
+                "rst_species",
+                label = "Clear Species Selection"
               )
             ),
            ## Year range
             div(id = "div_year",
               sliderInput(
                 "gbl_year_range", 
-                label = h5("Year Range"), 
+                label = years_label, 
                 min = min(as.numeric(vars_years)), 
                 max = max(as.numeric(vars_years)), 
                 value = c(years_min_year, years_max_year),
@@ -86,10 +96,15 @@ shinyUI(function(req) {
           # The control panel for the plots
             div(id = "div_plot_controls",
                 wellPanel(
-                  h4("Plot Controls"),
+                  h4("Plot/Table Controls"),
+                  selectizeInput(
+                    "gbl_plot_tbl", 
+                    label = "Display Type:", 
+                    choices = c("Plot" = "plot", "Table" = "table")
+                  ),
                   selectizeInput(
                     "gbl_group_plots",
-                    label = "Break plots by:",
+                    label = "Group by:",
                     choices = vars_groups,
                     selected = "none"
                   ),
@@ -124,31 +139,26 @@ shinyUI(function(req) {
           div(id = "div_ts",
             fluidRow(
               # Title is generated dynamically
-              uiOutput("plot_time_series_title")
+              uiOutput("plot_time_series_title"),
+              column(6, align = "center", offset = 3,
+                # Button to download the data
+                downloadButton("dl_ts", "Download selected data (CSV)")
+              )
             ),
-            fluidRow(
-              # Time series plot of landings per year
-              ggvisOutput("plot_time_series"),
-              uiOutput("plot_time_series_ui"),
-              # Button to download the data from this plot
-              downloadButton("dl_ts", "Download plot data (CSV)")
-            )
+            uiOutput("ts_page")
           )
         ),
         ## -------------------------------------------------------------------------
         ## Grouped variable panel
         ## -------------------------------------------------------------------------
         tabPanel(h4("Grouped Variable"), value = "group",
-           fluidRow(
-             # Lollipop chart of landings
-             plotOutput("plot_group", width = "auto", height = "600")
-           )
-        ),
-        ## -------------------------------------------------------------------------
-        ## Table panel - view various landings tables
-        ## -------------------------------------------------------------------------
-        tabPanel(h4("View Tables"), value = "tbls"
-          # Placeholder
+          div(id = "div_gr",
+            fluidRow(
+              # Title is generated dynamically
+              uiOutput("plot_gr_title")
+            ),
+            uiOutput("grouped_page")
+          )
         )
       ) # End tabset panel
     ) # End main panel
