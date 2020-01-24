@@ -22,7 +22,7 @@ ports_max_items = 5
 # Placeholder text when no port is selected
 ports_placeholder = "All Ports"
 # Label for the species selector
-species_label = h5("Species:")
+species_label = h4("Species:")
 # Max number of species to show in ports drop down
 species_max_options = Inf
 # Max number of species that can be selected by a user
@@ -30,7 +30,7 @@ species_max_items = 5
 # Placeholder text when no species is selected
 species_placeholder = "All Species"
 # Label for years selector
-years_label = h5("Years:")
+years_label = h4("Years:")
 # The default selected min and max for the years selector. The range of the
 # selector will automatically be set to the min/max years present in the data
 years_min_year = 2000
@@ -56,3 +56,45 @@ gbl_theme <- theme(
     size = 12
   )
 )
+
+## Global options to apply to all datatables in the portal
+gbl_dt_options <- list(
+  filter = "top",
+  #columnDefs = list(list(targets = 'all', searchable = T)),
+  pageLength = 20,
+  searching = T,
+  scrollX = T,
+  scrollY = T,
+  orderCellsTop = T,
+  fixedHeader = T,
+  orderClasses = T
+)
+
+# Names and labels of output numeric columns in datatables (used for formatting)
+# Move to settings.R sometime
+dt_cols <- list(
+  total_weight = list(
+    name = "total_weight",
+    label = "Total Weight"
+  ),
+  total_value = list(
+    name = "total_value",
+    label = "Total Value"
+  ),
+  total_trips = list(
+    name = "total_trips",
+    label = "Total Trips"
+  ),
+  total_harvs = list(
+    name = "total_harvs",
+    label = "Total Harvesters"
+  ),
+  year = list(
+    name = "year",
+    label = "Year"
+  )
+)
+
+## Digits to round weight and value to
+digits_weight <- 0
+digits_value <- 0
