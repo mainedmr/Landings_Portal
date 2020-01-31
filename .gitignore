@@ -39,4 +39,4 @@ vignettes/*.pdf
 .Renviron
 
 # Tracking settings
-tracking.R
+tracking_settings.R
