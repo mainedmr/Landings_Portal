@@ -28,7 +28,7 @@ if (file.exists("tracking_settings.R")) {
 source("functions.R")
 
 # Source queries
-source("queries.R")
+devtools::source_url(paste0(base_url, "queries.R"))
 
 # Set global table options
 options(DT.options = gbl_dt_options)

@@ -16,7 +16,7 @@ queries <- list(
       ),
       gbl_year_range = list(
         type = "slider",
-        value = c(2010, 2018)
+        value = c(2010, 2019)
       ),
       gbl_plot_tbl = list(
         type = "selectize",
@@ -32,7 +32,7 @@ queries <- list(
       )
     )
   ),
-  # Plot yearly lobster landings per zone
+  # Plot clam landings per town for 2018
   clam_towns_2018 = list(
     description = "Plot Softshell Clam Weight Per Town for 2018",
     tab = "group",
@@ -56,6 +56,68 @@ queries <- list(
       gbl_group_plots = list(
         type = "selectize",
         selected = "port"
+      ),
+      gbl_plot_series = list(
+        type = "selectize",
+        selected = "total_weight"
+      )
+    )
+  ),
+  # See a plot of elver value per county time series
+  elvers_per_county = list(
+    description = "Plot elver value per county for 2008 - 2010",
+    tab = "ts",
+    selections = list(
+      gbl_port = list(
+        type = "selectize",
+        selected = character(0)
+      ),
+      gbl_species = list(
+        type = "selectize",
+        selected = c("Elver")
+      ),
+      gbl_year_range = list(
+        type = "slider",
+        value = c(2008, 2018)
+      ),
+      gbl_plot_tbl = list(
+        type = "selectize",
+        selected = "plot"
+      ),
+      gbl_group_plots = list(
+        type = "selectize",
+        selected = "county"
+      ),
+      gbl_plot_series = list(
+        type = "selectize",
+        selected = "total_value"
+      )
+    )
+  ),
+  # See a table of cod, pollock, and haddock landings
+  groundfish_tbl = list(
+    description = "See a table of cod, pollock, and haddock landings per year",
+    tab = "ts",
+    selections = list(
+      gbl_port = list(
+        type = "selectize",
+        selected = character(0)
+      ),
+      gbl_species = list(
+        type = "selectize",
+        selected = c("Cod Atlantic", "Pollock", "Haddock")
+      ),
+      gbl_year_range = list(
+        type = "slider",
+        value = c(2008, 2018)
+      ),
+      gbl_plot_tbl = list(
+        type = "selectize",
+        selected = "table"
+      ),
+      gbl_group_plots = list(
+        type = "selectize",
+        selected = "none"
       ),
       gbl_plot_series = list(
         type = "selectize",
