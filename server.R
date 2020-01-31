@@ -9,20 +9,20 @@ shinyServer(function(input, output, session) {
     isolate(input$remote_addr)
   })
   # Then submit new session
-  #submit_event("new_session", "new_session", guid, ip = ip())
+  submit_event("new_session", "new_session", guid, ip = "ip()")
   # This code will be run after the client has disconnected
   session$onSessionEnded(function() {
-    #submit_event("end_session", "end_session", guid, ip = ip())
+    submit_event("end_session", "end_session", guid, ip = "ip()")
   })
   # React when a user agrees to geolocation and submit
   observeEvent(input$geolocation, {
     event_value <- ifelse(input$geolocation, "agreed", "denied")
-    #submit_event("geolocation", event_value, guid, 
-    #             ip = ip(), lat = input$lat, lon = input$long)
+    submit_event("geolocation", event_value, guid, 
+                ip = "ip()", lat = input$lat, lon = input$long)
   })
   # React when tab is changed
   observeEvent(input$tab_panel, {
-    #submit_event("tab_change", input$tab_panel, guid, ip = ip())
+    submit_event("tab_change", input$tab_panel, guid, ip = "ip()")
   })
   
   ## Clear port and species selectors when buttons hit
@@ -65,7 +65,7 @@ shinyServer(function(input, output, session) {
       }
     }
     # Submit event
-    #submit_event("sidebar_state", ifelse(sidebar_state, "on", "off"), guid, ip = ip())
+    submit_event("sidebar_state", ifelse(sidebar_state, "on", "off"), guid, ip = "ip()")
   })
   # Tamatoa lies in wait....
   tamatoa <- F
@@ -88,7 +88,7 @@ shinyServer(function(input, output, session) {
                  )
       tamatoa <<- T
       # Submit event
-      #submit_event("tamatoa", "shiiiiny", guid, ip = ip())
+      submit_event("tamatoa", "shiiiiny", guid, ip = "ip()")
     }
   })
   
@@ -134,6 +134,12 @@ shinyServer(function(input, output, session) {
     } else {"All Species"}
   })
 
+  ## React to preset query being selected
+  observeEvent(input$gbl_query, {
+    set_query(query_name = input$gbl_query, session)
+  })
+  
+  
   ## -------------------------------------------------------------------------
   ## About panel
   ## -------------------------------------------------------------------------
@@ -412,4 +418,9 @@ shinyServer(function(input, output, session) {
       readr::write_csv(gr_data(), con, na = "")
     }
   )
+  ## -------------------------------------------------------------------------
+  ## Map panel
+  ## -------------------------------------------------------------------------
+  
+  
 }) # End shinyServer
