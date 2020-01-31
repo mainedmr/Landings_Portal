@@ -39,6 +39,22 @@ shinyUI(function(req) {
           width = 2,
           ## Selectors
           fluidRow(wellPanel(
+            # Pre-defined queries button
+            dropdownButton(
+              tags$h3("Preset Queries"),
+              selectizeInput("gbl_query", label = "", 
+                 choices = vars_queries,
+                 options = list(placeholder = "Choose query",
+                                'plugins' = list('remove_button'),
+                                onInitialize = I('function() { this.setValue(""); }')
+                 )),
+              circle = T,
+              icon = icon("info-circle"),
+              status = "info",
+              size = "sm",
+              label = "Preset Queries",
+              tooltip = T
+            ),
             # Title for selector box
             selectors_title,
             ## Port
@@ -159,6 +175,18 @@ shinyUI(function(req) {
             ),
             uiOutput("grouped_page")
           )
+        ),
+        ## -------------------------------------------------------------------------
+        ## Map panel
+        ## -------------------------------------------------------------------------
+        tabPanel(h4("Map"), value = "map",
+           div(id = "div_map",
+               # The leaflet map
+               h4("In development, check back soon!")
+               #leafletOutput(
+              #   "map", width = "100%", height = "800px"
+               #)
+           )
         )
       ) # End tabset panel
     ) # End main panel

@@ -75,23 +75,48 @@ gbl_dt_options <- list(
 dt_cols <- list(
   total_weight = list(
     name = "total_weight",
-    label = "Total Weight"
+    label = glue("Total Weight ({unit_wt})"),
+    type = "var"
   ),
   total_value = list(
     name = "total_value",
-    label = "Total Value"
+    label = glue("Total Value ({unit_val})"),
+    type = "var"
   ),
   total_trips = list(
     name = "total_trips",
-    label = "Total Trips"
+    label = "Total Trips",
+    type = "var"
   ),
   total_harvs = list(
     name = "total_harvs",
-    label = "Total Harvesters"
+    label = "Total Harvesters",
+    type = "var"
   ),
   year = list(
     name = "year",
-    label = "Year"
+    label = "Year",
+    type = "ts"
+  ),
+  species = list(
+    name = "species",
+    label = "Species",
+    type = "group"
+  ),
+  port = list(
+    name = "port",
+    label = "Port",
+    type = "group"
+  ),
+  county = list(
+    name = "county",
+    label = "County",
+    type = "group"
+  ),
+  zone = list(
+    name = "lob_zone",
+    label = "Lobster Zone",
+    type = "group"
   )
 )
 
