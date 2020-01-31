@@ -214,6 +214,7 @@ shinyServer(function(input, output, session) {
   
   # Create time series plot
   reactive({
+    req(input$gbl_plot_tbl == "plot")
     # Make plot
     ts_data() %>%
       {
@@ -355,6 +356,7 @@ shinyServer(function(input, output, session) {
   })
   # Generate lollipop chart
   output$plot_group <- renderPlot({
+    req(input$gbl_plot_tbl == "plot")
     ggplot(gr_data(), aes(y = !!sym(input$gbl_group_plots), 
                           x = !!sym(input$gbl_plot_series))) +
     geom_point(size = 4, color = "orange") +
