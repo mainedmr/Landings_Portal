@@ -77,36 +77,3 @@ dt_cols_to_vec <- function(col_type) {
   names(vec_names) <- vec_labels
   return(vec_names)
 }
-
-# Generate a color palette for input numeric data for the number of bins and a
-# given color palette
-get_palette <- function(color_data, bins, palette, ceil = F) {
-  # Maximum value from the color by data
-  max_number <- max(color_data)
-  # Handle max errors
-  if (max_number == Inf | max_number == -Inf) {
-    max_number <- bins
-  }
-  # If the max number is less than the number of bins AND not ceil (ie log adj),
-  # just set both maxes to the number of bins; else set max scale to 
-  # next bin up from max_number
-  if (max_number < bins & ceil) {
-    max_number <- bins
-    max_scale <- bins
-  } else if (!ceil) {
-    # Max scale is max number
-    max_scale <- max_number
-  } else {
-    # Intialize max scale as nearest integer up from max number
-    max_scale <- ceiling(max_number)
-    # Increase max scale to be evenly divisible by number of bins
-    while (max_scale %% bins != 0) {
-      max_scale <- max_scale + 1
-    }
-  }
-  # Create bins
-  my_bins = seq(0, max_scale, by = max_scale / bins)
-  my_palette = colorBin(palette = palette, domain = max_number,
-                       na.color = "transparent", bins = my_bins)
-  return(my_palette)
-}

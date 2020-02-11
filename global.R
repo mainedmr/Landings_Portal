@@ -8,6 +8,7 @@ library(ggvis)
 library(glue)
 library(DT)
 library(uuid)
+library(RColorBrewer)
 
 # Base url to the GitHub repo with data and settings
 base_url <- "https://github.com/mainedmr/Landings_Portal/raw/master/"
@@ -35,6 +36,11 @@ options(DT.options = gbl_dt_options)
 
 # Load port SF layer
 load("ports.Rda")
+# Load map helper functions
+source("map_functions.R")
+vars_map_lyrs <- c("Port" = "ports")
+
+
 
 ### List of variables for selectors
 vars_species <- sort(c(unique(landings$species), "Coconut Crab"))

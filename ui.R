@@ -110,28 +110,50 @@ shinyUI(function(req) {
             ) # End div_year
           ), # End well panel 
           # The control panel for the plots
-            div(id = "div_plot_controls",
-                wellPanel(
-                  h4("Plot/Table Controls"),
-                  selectizeInput(
-                    "gbl_plot_tbl", 
-                    label = "Display Type:", 
-                    choices = c("Plot" = "plot", "Table" = "table")
-                  ),
-                  selectizeInput(
-                    "gbl_group_plots",
-                    label = "Group by:",
-                    choices = vars_groups,
-                    selected = "none"
-                  ),
-                  selectizeInput(
-                    "gbl_plot_series",
-                    label = "Plot Series:",
-                    choices = vars_series,
-                    selected = vars_series[1]
-                  )
-                ) # End well panel
-            ) # End plot control div
+          div(id = "div_plot_controls",
+              wellPanel(
+                h4("Plot/Table Controls"),
+                selectizeInput(
+                  "gbl_plot_tbl", 
+                  label = "Display Type:", 
+                  choices = c("Plot" = "plot", "Table" = "table")
+                ),
+                selectizeInput(
+                  "gbl_group_plots",
+                  label = "Group by:",
+                  choices = vars_groups,
+                  selected = "none"
+                ),
+                selectizeInput(
+                  "gbl_plot_series",
+                  label = "Plot Series:",
+                  choices = vars_series,
+                  selected = vars_series[1]
+                )
+              ) # End well panel
+            ), # End plot control div
+        # The control panel for the map
+        div(id = "div_map_controls",
+            wellPanel(
+              h4("Map Controls"),
+              selectizeInput(
+                "gbl_map_lyr",
+                label = "Map by:",
+                choices = vars_map_lyrs,
+                selected = vars_map_lyrs[1]
+              ),
+              selectizeInput(
+                "gbl_map_color",
+                label = "Color by:",
+                choices = vars_series,
+                selected = vars_series[1]
+              ),
+              selectInput("gbl_map_colors", 
+                label = "Color Scheme:",
+                choices = rownames(subset(brewer.pal.info, category %in% c("seq", "div"))),
+                selected = "YlOrBr")
+            ) # End well panel
+          ) # End map control div
         ) # End fluid row
       ) # End sidebar panel
     ), # End sidebar div
@@ -182,10 +204,10 @@ shinyUI(function(req) {
         tabPanel(h4("Map"), value = "map",
            div(id = "div_map",
                # The leaflet map
-               h4("In development, check back soon!")
-               #leafletOutput(
-              #   "map", width = "100%", height = "800px"
-               #)
+               h4("In development, check back soon!"),
+               leafletOutput(
+                 "map", width = "100%", height = "800px"
+               )
            )
         )
       ) # End tabset panel

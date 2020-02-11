@@ -23,6 +23,14 @@ shinyServer(function(input, output, session) {
   # React when tab is changed
   observeEvent(input$tab_panel, {
     submit_event("tab_change", input$tab_panel, guid, ip = "ip()")
+    # Disable/enable plot and map control panels depending on tab clicked
+    if (input$tab_panel == "map") {
+      shinyjs::show("div_map_controls")
+      shinyjs::hide("div_plot_controls")
+    } else {
+      shinyjs::hide("div_map_controls")
+      shinyjs::show("div_plot_controls")
+    }
   })
   
   ## Clear port and species selectors when buttons hit
@@ -423,6 +431,9 @@ shinyServer(function(input, output, session) {
   ## -------------------------------------------------------------------------
   ## Map panel
   ## -------------------------------------------------------------------------
+  # Render basemap
+  output$map <- get_leaflet_base()
+  # Modify map when selectors change
   
   
 }) # End shinyServer
