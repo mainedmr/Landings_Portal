@@ -6,7 +6,7 @@ queries <- list(
     description = "Plot Yearly Lobster Landings Per Zone",
     tab = "ts",
     selections = list(
-      gbl_port = list(
+      gbl_ports = list(
         type = "selectize",
         selected = character(0)
       ),
@@ -37,7 +37,7 @@ queries <- list(
     description = "Plot Softshell Clam Weight Per Town for 2018",
     tab = "group",
     selections = list(
-      gbl_port = list(
+      gbl_ports = list(
         type = "selectize",
         selected = character(0)
       ),
@@ -68,7 +68,7 @@ queries <- list(
     description = "Plot elver value per county for 2008 - 2010",
     tab = "ts",
     selections = list(
-      gbl_port = list(
+      gbl_ports = list(
         type = "selectize",
         selected = character(0)
       ),
@@ -99,7 +99,7 @@ queries <- list(
     description = "See a table of cod, pollock, and haddock landings per year",
     tab = "ts",
     selections = list(
-      gbl_port = list(
+      gbl_ports = list(
         type = "selectize",
         selected = character(0)
       ),
