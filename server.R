@@ -1,4 +1,5 @@
 library(shiny)
+library(shinyjs)
 library(glue)
 
 shinyServer(function(input, output, session) {
@@ -20,6 +21,12 @@ shinyServer(function(input, output, session) {
     submit_event("geolocation", event_value, guid, 
                 ip = "ip()", lat = input$lat, lon = input$long)
   })
+  ## This bit reacts when a tab is clicked and hides/shows the sidebar depending
+  ## on the tab; ie, for the About and Data tab the sidebar is hidden
+  # Session-wide boolean for side panel state
+  sidebar_state <- F
+  # Session-wide boolean for map bumped
+  map_bumped <- F
   # React when tab is changed
   observeEvent(input$tab_panel, {
     submit_event("tab_change", input$tab_panel, guid, ip = "ip()")
@@ -27,36 +34,31 @@ shinyServer(function(input, output, session) {
     if (input$tab_panel == "map") {
       shinyjs::show("div_map_controls")
       shinyjs::hide("div_plot_controls")
+      shinyjs::hide("div_port")
+      # Force the map to draw by toggling a selector- this makes sure the map draws
+      # when the session is started - only due this once per session, as 
+      # per map_bumped boolean
+      if (!(map_bumped)) {
+        current <- input$map_color_by
+        updateSelectInput(session, "map_color_by", selected = vars_series[2])
+        updateSelectInput(session, "map_color_by", selected = current)
+        map_bumped <<- T
+      }
     } else {
       shinyjs::hide("div_map_controls")
       shinyjs::show("div_plot_controls")
+      shinyjs::show("div_port")
     }
-  })
-  
-  ## Clear port and species selectors when buttons hit
-  observeEvent(input$rst_port, {
-    updateSelectizeInput(session, "gbl_ports", selected = character(0))
-  })
-  observeEvent(input$rst_species, {
-    updateSelectizeInput(session, "gbl_species", selected = character(0))
-  })
-  ## This bit reacts when a tab is clicked and hides/shows the sidebar depending
-  ## on the tab; ie, for the About and Data tab the sidebar is hidden
-  # Session-wide boolean for side panel state
-  sidebar_state <- F
-  # Session-wide boolean for map bumped
-  map_bumped <- F
-  observe({
-    req(input$tab_panel)
     # Hide the sidebar panel when About or View Download is chosen
     if (input$tab_panel == "about") {
-      shinyjs::hide(id = "div_sidebar")
+      shinyjs::hide("div_sidebar")
       sidebar_state <<- F
     } else {
-      shinyjs::show(id = "div_sidebar")
+      shinyjs::show("div_sidebar")
       sidebar_state <<- T
     }
   })
+  
   ## Toggle sidebar on/off with button clicks
   observeEvent(input$sidebar_toggle, {
     req(input$sidebar_toggle)
@@ -75,6 +77,16 @@ shinyServer(function(input, output, session) {
     # Submit event
     submit_event("sidebar_state", ifelse(sidebar_state, "on", "off"), guid, ip = "ip()")
   })
+  
+  ## Clear port and species selectors when buttons hit
+  observeEvent(input$rst_port, {
+    updateSelectizeInput(session, "gbl_ports", selected = character(0))
+  })
+  observeEvent(input$rst_species, {
+    updateSelectizeInput(session, "gbl_species", selected = character(0))
+  })
+
+
   # Tamatoa lies in wait....
   tamatoa <- F
   observeEvent({input$gbl_ports 
@@ -433,7 +445,101 @@ shinyServer(function(input, output, session) {
   ## -------------------------------------------------------------------------
   # Render basemap
   output$map <- get_leaflet_base()
+  # Get data for map
+  # Filter data reactively and join to spatial layer for map
+  map_data <- reactive({
+    validate(
+      # Require that the selected map layer exist
+      need(exists(paste0("lyr_", input$map_lyr)), "Map layer selected does not exist!.")
+    )
+    d <- landings %>%
+      # Filter by selected species if filter species is checked
+      {if (fil_species()) {
+        dplyr::filter(., species %in% input$gbl_species)
+      } else {.}} %>%
+      # Filter by selected year range
+      dplyr::filter(between(year, input$gbl_year_range[1], 
+                            input$gbl_year_range[2])) %>%
+      # Group based on selected group variable
+      #dplyr::group_by(!!sym(input$map_lyr)) %>%
+      dplyr::group_by(!!sym(input$map_lyr)) %>%
+      # Sum weight, value, trips, harvesters
+      dplyr::summarise(total_weight = sum(weight, na.rm = T),
+                       total_value = sum(value, na.rm = T),
+                       total_trips = sum(trip_n, na.rm = T),
+                       total_harvs = sum(harv_n, na.rm = T))
+    
+    # Join spatial data to landings
+    f <- get(paste0("lyr_", input$map_lyr)) %>%
+      # Join
+      dplyr::left_join(d, by = input$map_lyr) %>%
+      # Replace NAs in numeric cols with 0s
+      dplyr::mutate_if(is.numeric, replace_na, replace = 0)
+    rm(d)
+    return(f)
+  })
   # Modify map when selectors change
-  
+  observe({
+    validate(
+      need(nrow(map_data()) >= 1, "No data in selection.")
+    )
+    # Get color palette for map layer
+    color_data <- as.numeric(map_data()[[input$map_color_by]])
+    map_pal <- get_palette(color_data = color_data, 
+                           bins = 10, palette = input$map_color_scheme)
+    # Build popups for map layer
+    popups <- paste0(
+      "<strong>", get_var_name(vars_map_lyrs, input$map_lyr), ": </strong>",
+      map_data()[[input$map_lyr]],
+      "<br/><strong>Pounds: </strong>", prettyNum(round(map_data()$total_weight, 0), big.mark = ",", scientific = F),
+      "<br/><strong>Value ($): </strong>", prettyNum(round(map_data()$total_value, 0), big.mark = ",", scientific = F),
+      "<br/><strong>Trips: </strong>", prettyNum(round(map_data()$total_trips, 0), big.mark = ",", scientific = F),
+      "<br/><strong>Harvesters: </strong>", prettyNum(round(map_data()$total_harvs, 0), big.mark = ",", scientific = F)
+    ) %>%
+      lapply(htmltools::HTML)
+    # Build legend title
+    legend_title <- paste0(get_var_name(vars_series, input$map_color_by), 
+                           " per ", get_var_name(vars_map_lyrs, input$map_lyr))
+    # Proxy leaflet map with generated map data
+    leafletProxy("map") %>%
+      # Clear markers
+      clearMarkers() %>%
+      # Clear poly group
+      clearGroup("poly") %>%
+      # Clear controls
+      clearControls() %>%
+      # Add circle markers if mapping points
+      {if ("sfc_POINT" %in% class(map_data()$geometry)) {
+        addCircleMarkers(., data = map_data(),
+           # Assign tow number as layer ID for use in histogram popup
+           #layerId = ~tow_num,
+           fillColor = map_pal(color_data), 
+           fillOpacity = 0.7, color = "white", 
+           radius = 8, stroke = F,
+           label = popups,
+           labelOptions = labelOptions(style = list("font-weight" = "normal", 
+                                                    padding = "3px 8px"), 
+                                       textsize = "13px", 
+                                       direction = "auto")
+        )
+      } else {.}} %>%
+      # Add polygons if mapping counties, zones, etc
+      {if ("sfc_POLYGON" %in% class(map_data()$geometry) |
+           "sfc_MULTIPOLYGON" %in% class(map_data()$geometry)) {
+        addPolygons(., data = map_data(),
+          group = "poly", fillColor = map_pal(color_data),
+          fillOpacity = 0.7, color = "white",
+          stroke = F, label = popups,
+          labelOptions = labelOptions(style = list("font-weight" = "normal", 
+                                                   padding = "3px 8px"), 
+                                      textsize = "13px", 
+                                      direction = "auto")
+        )
+      } else {.}} %>%
+      # Add legend
+      addLegend(pal = map_pal, values = color_data, opacity = 0.9, 
+                title = legend_title, 
+                position = "bottomright")
+  })
   
 }) # End shinyServer

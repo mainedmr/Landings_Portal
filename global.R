@@ -9,6 +9,10 @@ library(glue)
 library(DT)
 library(uuid)
 library(RColorBrewer)
+library(leaflet)
+library(leaflet.esri)
+library(leaflet.extras)
+library(sf)
 
 # Base url to the GitHub repo with data and settings
 base_url <- "https://github.com/mainedmr/Landings_Portal/raw/master/"
@@ -34,13 +38,16 @@ devtools::source_url(paste0(base_url, "queries.R"))
 # Set global table options
 options(DT.options = gbl_dt_options)
 
-# Load port SF layer
-load("ports.Rda")
+# Load map layers (SF objects in Rda)
+load("map_layers.Rda")
+
 # Load map helper functions
 source("map_functions.R")
-vars_map_lyrs <- c("Port" = "ports")
 
 
+vars_map_lyrs <- c("Port" = "port",
+                   "County" = "county",
+                   "Lobster Zone" = "lob_zone")
 
 ### List of variables for selectors
 vars_species <- sort(c(unique(landings$species), "Coconut Crab"))

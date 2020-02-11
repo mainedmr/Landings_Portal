@@ -19,7 +19,7 @@ get_leaflet_base <- function(view = c(44, -69, 8)) {
       # Baselayer control
       addLayersControl(
         position = "topleft",
-        baseGroups = c("ESRI World Oceans", "ESRI World Imagery", "NOAA Chart Service"),
+        baseGroups = c("ESRI World Imagery", "ESRI World Oceans", "NOAA Chart Service"),
         options = layersControlOptions(collapsed = F)
       ) #%>%
       # # Drawing tool bar for multi-selections
@@ -68,11 +68,11 @@ get_leaflet_base <- function(view = c(44, -69, 8)) {
 #' the max of the color data; false should be passed when applying log adjust.
 get_palette <- function(color_data, bins, palette, ceil = T) {
   # Maximum value from the color by data
-  max_number <- max(color_data)
+  max_number <- max(color_data, na.rm = T)
   # Handle max errors
-  if (max_number == Inf | max_number == -Inf) {
-    max_number <- bins
-  }
+  #if (max_number == Inf | max_number == -Inf) {
+  #  max_number <- bins
+  #}
   # If the max number is less than the number of bins AND not ceil (ie log adj),
   # just set both maxes to the number of bins; else set max scale to 
   # next bin up from max_number
