@@ -137,9 +137,17 @@ shinyServer(function(input, output, session) {
   lab_series <- reactive({
     get_var_name(vars_series, input$gbl_plot_series)
   })
+  # Map variable label
+  lab_map_series <- reactive({
+    get_var_name(vars_series, input$map_color_by)
+  })
   # Group label
   lab_group <- reactive({
     get_var_name(vars_groups, input$gbl_group_plots)
+  })
+  # Map layer label
+  lab_map_lyr <- reactive({
+    get_var_name(vars_map_lyrs, input$map_lyr)
   })
   # Ports selected label
   lab_ports <- reactive({
@@ -443,6 +451,19 @@ shinyServer(function(input, output, session) {
   ## -------------------------------------------------------------------------
   ## Map panel
   ## -------------------------------------------------------------------------
+  # Render plot title reactively
+  output$map_title <- renderUI({
+    title <- glue("{lab_map_series()} per {lab_map_lyr()}, \\
+                  {input$gbl_year_range[1]} to {input$gbl_year_range[2]}")
+    tagList(
+      h4(title, align = "center"),
+      h5(lab_species(), align = "center")
+      #column(6, align = "center", offset = 3,
+      #       # Button to download the data
+      #       downloadButton("dl_gr", "Download selected data (CSV)")
+      #)
+    )
+  })
   # Render basemap
   output$map <- get_leaflet_base()
   # Get data for map
@@ -489,7 +510,7 @@ shinyServer(function(input, output, session) {
                            bins = 10, palette = input$map_color_scheme)
     # Build popups for map layer
     popups <- paste0(
-      "<strong>", get_var_name(vars_map_lyrs, input$map_lyr), ": </strong>",
+      "<strong>", lab_map_lyr(), ": </strong>",
       map_data()[[input$map_lyr]],
       "<br/><strong>Pounds: </strong>", prettyNum(round(map_data()$total_weight, 0), big.mark = ",", scientific = F),
       "<br/><strong>Value ($): </strong>", prettyNum(round(map_data()$total_value, 0), big.mark = ",", scientific = F),
@@ -498,8 +519,7 @@ shinyServer(function(input, output, session) {
     ) %>%
       lapply(htmltools::HTML)
     # Build legend title
-    legend_title <- paste0(get_var_name(vars_series, input$map_color_by), 
-                           " per ", get_var_name(vars_map_lyrs, input$map_lyr))
+    legend_title <- paste0(lab_map_series(), " per ", lab_map_lyr())
     # Proxy leaflet map with generated map data
     leafletProxy("map") %>%
       # Clear markers
