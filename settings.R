@@ -124,3 +124,8 @@ dt_cols <- list(
 digits_weight <- 0
 digits_value <- 0
 
+
+## Map settings
+# Min max radii for points in Leaflet
+point_size <- c(2, 15)
+

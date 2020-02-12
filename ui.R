@@ -151,7 +151,15 @@ shinyUI(function(req) {
               selectInput("map_color_scheme", 
                 label = "Color Scheme:",
                 choices = rownames(subset(brewer.pal.info, category %in% c("seq", "div"))),
-                selected = "YlOrBr")
+                selected = "YlOrBr"),
+              div(id = "div_size_by",
+                selectizeInput(
+                  "map_size_by",
+                  label = "Size Points by:",
+                  choices = vars_series,
+                  selected = vars_series[2]
+                )
+              )
             ) # End well panel
           ) # End map control div
         ) # End fluid row

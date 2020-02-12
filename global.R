@@ -13,6 +13,7 @@ library(leaflet)
 library(leaflet.esri)
 library(leaflet.extras)
 library(sf)
+library(scales)
 
 # Base url to the GitHub repo with data and settings
 base_url <- "https://github.com/mainedmr/Landings_Portal/raw/master/"
