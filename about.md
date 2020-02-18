@@ -54,5 +54,3 @@ In addition to the `About` tab you are presently reading, three tabs display lan
 
 * **Map** - Displays a map of landings per port, county, or lobster zone (`Map by` selector). Hovering over a map feature displays a popup of landings information for that feature.
 
-
-
