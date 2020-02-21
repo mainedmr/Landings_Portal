@@ -10,7 +10,7 @@ if (rstudioapi::isAvailable()) {
 
 
 # Input CSV file
-input_csv <- "landings_new.csv"
+input_csv <- "portal_update_02_21_2020.csv"
 
 # Check that all columns for portal are included
 req_cols <- c("year", "species", "port", "county", "lob_zone", 
@@ -35,6 +35,14 @@ landings <- readr::read_csv(input_csv) %>%
     county = "UK",
     lob_zone = "UK"
   ))
+
+# If landings value is character, convert to numeric
+if (class(landings$value) == 'character') {
+  # Replace $ ,
+  landings$value <- gsub("[\\$,]", "", landings$value)
+  landings$value <- gsub(",", "", landings$value)
+  landings$value <- as.numeric(landings$value)
+}
 
 # Save file
 save(landings, file = "landings.Rda")
