@@ -114,6 +114,11 @@ shinyUI(function(req) {
               wellPanel(
                 h4("Plot/Table Controls"),
                 selectizeInput(
+                  "gbl_landings_type", 
+                  label = "Landings Type:", 
+                  choices = c("Modern" = "mod", "Historic" = "hist")
+                ),
+                selectizeInput(
                   "gbl_plot_tbl", 
                   label = "Display Type:", 
                   choices = c("Plot" = "plot", "Table" = "table")

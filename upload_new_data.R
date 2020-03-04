@@ -10,7 +10,7 @@ if (rstudioapi::isAvailable()) {
 
 
 # Input CSV file
-input_csv <- "portal_update_02_21_2020.csv"
+input_csv <- "landings_update_03_04_2020.csv"
 
 # Check that all columns for portal are included
 req_cols <- c("year", "species", "port", "county", "lob_zone", 
@@ -26,7 +26,8 @@ landings <- readr::read_csv(input_csv) %>%
                 value = total_value,
                 trip_n = `#_trips`,
                 harv_n = `#_active_harvesters`) %>%
-  mutate(species = stringr::str_to_title(species)) %>%
+  mutate(species = stringr::str_to_title(species),
+         year = as.numeric(year)) %>%
   # Select just columns needed
   dplyr::select(!!req_cols) %>%
   # Replace NAs
@@ -38,14 +39,40 @@ landings <- readr::read_csv(input_csv) %>%
 
 # If landings value is character, convert to numeric
 if (class(landings$value) == 'character') {
-  # Replace $ ,
-  landings$value <- gsub("[\\$,]", "", landings$value)
-  landings$value <- gsub(",", "", landings$value)
-  landings$value <- as.numeric(landings$value)
+  # Replace $ , then convert to numeric
+  landings$value <- as.numeric(gsub("[\\$,]", "", landings$value))
+}
+
+
+##### Historic landings
+
+# Input CSV file
+input_csv <- "hist_landings.csv"
+
+# Check that all columns for portal are included
+req_cols <- c("year", "species", "weight", "value")
+
+# Load data
+hist_landings <- readr::read_csv(input_csv) %>%
+  dplyr::rename_all(tolower) %>%
+  # Rename fields here if necessary
+  dplyr::rename(year = year,
+                species = species,
+                weight = pounds,
+                value = value) %>%
+  mutate(species = stringr::str_to_title(species),
+         year = as.numeric(year)) %>%
+  # Select just columns needed
+  dplyr::select(!!req_cols)
+
+# If landings value is character, convert to numeric
+if (class(hist_landings$value) == 'character') {
+  # Replace $ , then convert to numeric
+  hist_landings$value <- as.numeric(gsub("[\\$,]", "", hist_landings$value))
 }
 
 # Save file
-save(landings, file = "landings.Rda")
+save(landings, hist_landings, file = "landings.Rda")
 
 # Then upload the output landings.Rda file to the GitHub repo; for convenience,
 # the output folder is opened

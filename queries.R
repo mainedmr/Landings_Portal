@@ -18,6 +18,10 @@ queries <- list(
         type = "slider",
         value = c(2010, 2019)
       ),
+      gbl_landings_type = list(
+        type = "selectize",
+        selected = "mod"
+      ),
       gbl_plot_tbl = list(
         type = "selectize",
         selected = "plot"
@@ -48,6 +52,10 @@ queries <- list(
       gbl_year_range = list(
         type = "slider",
         value = c(2018, 2018)
+      ),
+      gbl_landings_type = list(
+        type = "selectize",
+        selected = "mod"
       ),
       gbl_plot_tbl = list(
         type = "selectize",
@@ -80,6 +88,10 @@ queries <- list(
         type = "slider",
         value = c(2008, 2018)
       ),
+      gbl_landings_type = list(
+        type = "selectize",
+        selected = "mod"
+      ),
       gbl_plot_tbl = list(
         type = "selectize",
         selected = "plot"
@@ -111,9 +123,48 @@ queries <- list(
         type = "slider",
         value = c(2008, 2018)
       ),
+      gbl_landings_type = list(
+        type = "selectize",
+        selected = "mod"
+      ),
       gbl_plot_tbl = list(
         type = "selectize",
         selected = "table"
+      ),
+      gbl_group_plots = list(
+        type = "selectize",
+        selected = "none"
+      ),
+      gbl_plot_series = list(
+        type = "selectize",
+        selected = "total_weight"
+      )
+    )
+  ),
+  # See a plot of historic groundfish landings
+  groundfish_hist = list(
+    description = "See a plot of historic cod, pollock, and haddock landings",
+    tab = "ts",
+    selections = list(
+      gbl_ports = list(
+        type = "selectize",
+        selected = character(0)
+      ),
+      gbl_species = list(
+        type = "selectize",
+        selected = c("Cod Atlantic", "Pollock", "Haddock")
+      ),
+      gbl_year_range = list(
+        type = "slider",
+        value = c(1950, 2019)
+      ),
+      gbl_landings_type = list(
+        type = "selectize",
+        selected = "hist"
+      ),
+      gbl_plot_tbl = list(
+        type = "selectize",
+        selected = "plot"
       ),
       gbl_group_plots = list(
         type = "selectize",

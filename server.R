@@ -47,7 +47,11 @@ shinyServer(function(input, output, session) {
     } else {
       shinyjs::hide("div_map_controls")
       shinyjs::show("div_plot_controls")
-      shinyjs::show("div_port")
+      if (input$gbl_landings_type == 'mod') {
+        shinyjs::show("div_port")
+      } else {
+        shinyjs::hide("div_port")
+      }
     }
     # Hide the sidebar panel when About or View Download is chosen
     if (input$tab_panel == "about") {
@@ -155,7 +159,7 @@ shinyServer(function(input, output, session) {
   })
   # Ports selected label
   lab_ports <- reactive({
-    if (fil_ports()) {
+    if (fil_ports() & input$gbl_landings_type == 'mod') {
       paste0("Ports: ", paste(sort(input$gbl_ports), collapse = ", "))
     } else {"All Ports"}
   })
@@ -170,6 +174,59 @@ shinyServer(function(input, output, session) {
   observeEvent(input$gbl_query, {
     set_query(query_name = input$gbl_query, session)
   })
+  
+  ## React to selector for modern/historic landings
+  observeEvent(input$gbl_landings_type, {
+    # Modern landings
+    if (input$gbl_landings_type == 'mod') {
+      # Show port selector
+      shinyjs::show('div_port')
+      # Show map tab
+      showTab(inputId = 'tab_panel', target = 'map')
+      # Update species selector
+      updateSelectizeInput(session, inputId = 'gbl_species', 
+                           choices = vars_species,
+                           selected = character(0))
+      # Update years selector
+      updateSliderInput(session, inputId = 'gbl_year_range', 
+                        min = min(as.numeric(vars_years)), 
+                        max = max(as.numeric(vars_years)), 
+                        value = c(years_min_year, years_max_year))
+      # Update group by selector
+      updateSelectizeInput(session, inputId = 'gbl_group_plots',
+                            choices = vars_groups,
+                            selected = "none")
+      # Update series selector
+      updateSelectizeInput(session, inputId = 'gbl_plot_series',
+                            choices = vars_series)
+    } else {
+      # Hide port selector
+      shinyjs::hide('div_port')
+      # Hide map tab
+      hideTab(inputId = 'tab_panel', target = 'map')
+      # Update species selector
+      updateSelectizeInput(session, inputId = 'gbl_species', 
+                           label = NULL, 
+                           choices = vars_hist_species,
+                           selected = character(0))
+      # Update years selector
+      updateSliderInput(session, inputId = 'gbl_year_range', 
+                        min = min(as.numeric(vars_hist_years)), 
+                        max = max(as.numeric(vars_hist_years)), 
+                        value = c(years_hist_min_year, 
+                                  max(as.numeric(vars_hist_years))))
+      # Update group by selector
+      updateSelectizeInput(session, inputId = 'gbl_group_plots',
+                           choices = vars_hist_groups,
+                           selected = "none")
+      # Update series selector
+      updateSelectizeInput(session, inputId = 'gbl_plot_series',
+                           choices = vars_hist_series,
+                           selected = vars_hist_series[1])
+    }
+  })
+  
+  
   
   
   ## -------------------------------------------------------------------------
@@ -195,13 +252,13 @@ shinyServer(function(input, output, session) {
   ## -------------------------------------------------------------------------
   # Filter data reactively
   ts_data <- reactive({
-    d <- landings %>%  
+    d <- {if (input$gbl_landings_type == 'mod') landings else hist_landings} %>%  
     # Filter by selected species if species are selected
     {if (fil_species()) {
       dplyr::filter(., species %in% input$gbl_species)
     } else {.}} %>%
     # Filter by selected ports if ports are selected
-    {if (fil_ports()) {
+    {if (fil_ports() & input$gbl_landings_type == 'mod') {
       dplyr::filter(., port %in% input$gbl_ports)
     } else {.}} %>%
     # Filter by selected year range
@@ -339,13 +396,13 @@ shinyServer(function(input, output, session) {
     validate(
       need(input$gbl_group_plots != "none", "Please select a grouping variable.")
     )
-    d <- landings %>%
-      # Filter by selected species if filter species is checked
+    d <- {if (input$gbl_landings_type == 'mod') landings else hist_landings} %>%
+      # Filter by selected species if filtering species
       {if (fil_species()) {
         dplyr::filter(., species %in% input$gbl_species)
       } else {.}} %>%
-      # Filter by selected ports if filter ports is checked
-      {if (fil_ports()) {
+      # Filter by selected ports if filtering ports and viewing modern
+      {if (fil_ports() & input$gbl_landings_type == 'mod') {
         dplyr::filter(., port %in% input$gbl_ports)
       } else {.}} %>%
       # Filter by selected year range

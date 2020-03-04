@@ -36,6 +36,8 @@ years_label = h4("Years:")
 years_min_year = 2000
 years_max_year = 2019
 
+years_hist_min_year = 1950
+
 # Set global ggplot theme options - these styles are applied across all
 # ggplot produced plots in the portal
 gbl_theme <- theme(
