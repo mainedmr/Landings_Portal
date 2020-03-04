@@ -176,9 +176,18 @@ shinyServer(function(input, output, session) {
   })
   
   ## React to selector for modern/historic landings
+  hist_toggle <- F
   observeEvent(input$gbl_landings_type, {
+    hist_toggle <<- T
     # Modern landings
     if (input$gbl_landings_type == 'mod') {
+      # Update group by selector
+      updateSelectizeInput(session, inputId = 'gbl_group_plots',
+                           choices = vars_groups,
+                           selected = "none")
+      # Update series selector
+      updateSelectizeInput(session, inputId = 'gbl_plot_series',
+                           choices = vars_series)
       # Show port selector
       shinyjs::show('div_port')
       # Show map tab
@@ -192,14 +201,16 @@ shinyServer(function(input, output, session) {
                         min = min(as.numeric(vars_years)), 
                         max = max(as.numeric(vars_years)), 
                         value = c(years_min_year, years_max_year))
+      
+    } else {
       # Update group by selector
       updateSelectizeInput(session, inputId = 'gbl_group_plots',
-                            choices = vars_groups,
-                            selected = "none")
+                           choices = vars_hist_groups,
+                           selected = "none")
       # Update series selector
       updateSelectizeInput(session, inputId = 'gbl_plot_series',
-                            choices = vars_series)
-    } else {
+                           choices = vars_hist_series,
+                           selected = vars_hist_series[1])
       # Hide port selector
       shinyjs::hide('div_port')
       # Hide map tab
@@ -215,19 +226,9 @@ shinyServer(function(input, output, session) {
                         max = max(as.numeric(vars_hist_years)), 
                         value = c(years_hist_min_year, 
                                   max(as.numeric(vars_hist_years))))
-      # Update group by selector
-      updateSelectizeInput(session, inputId = 'gbl_group_plots',
-                           choices = vars_hist_groups,
-                           selected = "none")
-      # Update series selector
-      updateSelectizeInput(session, inputId = 'gbl_plot_series',
-                           choices = vars_hist_series,
-                           selected = vars_hist_series[1])
     }
-  })
-  
-  
-  
+    hist_toggle <<- F
+  }, priority = 500)
   
   ## -------------------------------------------------------------------------
   ## About panel
@@ -252,6 +253,7 @@ shinyServer(function(input, output, session) {
   ## -------------------------------------------------------------------------
   # Filter data reactively
   ts_data <- reactive({
+    req(!hist_toggle)
     d <- {if (input$gbl_landings_type == 'mod') landings else hist_landings} %>%  
     # Filter by selected species if species are selected
     {if (fil_species()) {
@@ -392,6 +394,7 @@ shinyServer(function(input, output, session) {
   ## -------------------------------------------------------------------------
   # Filter data reactively
   gr_data <- reactive({
+    req(!hist_toggle)
     # Require the user to choose a grouping variable
     validate(
       need(input$gbl_group_plots != "none", "Please select a grouping variable.")
