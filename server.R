@@ -270,6 +270,8 @@ shinyServer(function(input, output, session) {
     dplyr::group_by(year) %>%
     # Then conditionally group based on selected group variable
     {if (input$gbl_group_plots != 'none') {
+      # Require that column is in data (handles reactivity errors)
+      req(input$gbl_group_plots %in% colnames(.))
       dplyr::group_by(., !!sym(input$gbl_group_plots), add = T)
     } else {.}} %>%
     # Sum weight, value, trips, harvesters
@@ -400,6 +402,9 @@ shinyServer(function(input, output, session) {
       need(input$gbl_group_plots != "none", "Please select a grouping variable.")
     )
     d <- {if (input$gbl_landings_type == 'mod') landings else hist_landings} %>%
+      # Require that column is in data (handles reactivity errors)
+      {req(input$gbl_group_plots %in% colnames(.))
+        .} %>%
       # Filter by selected species if filtering species
       {if (fil_species()) {
         dplyr::filter(., species %in% input$gbl_species)
