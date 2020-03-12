@@ -4,7 +4,7 @@ Welcome to the state of Maine Department of Marine Resources Landings Data Porta
 
 # Caveats/Data Limitations
 
-Data in this portal for is periodically updated and may differ from data shown in other DMR landings documents.
+**Data in this portal is periodically updated and may differ from data shown in other DMR landings documents.**
 
 Landings presented in this portal are split between two data sources:
 
