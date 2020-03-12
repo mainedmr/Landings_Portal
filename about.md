@@ -4,6 +4,8 @@ Welcome to the state of Maine Department of Marine Resources Landings Data Porta
 
 # Caveats/Data Limitations
 
+Data in this portal for is periodically updated and may differ from data shown in other DMR landings documents.
+
 Landings presented in this portal are split between two data sources:
 
 * `Modern` landings data is presented per year, species, and non-confidential port. Confidential landings are aggregated into the `Other Maine` or `Other County Name` ports.
