@@ -21,6 +21,10 @@ The sidebar displays on the left of the portal and contains selectors that allow
 
 The blue `i` button at the top of the sidebar contains preset queries. Choosing one of these queries will set the correct selectors and active tab to display the described results.
 
+### Batch Download
+
+The green download button at the top of the sidebar allows all modern and historic landings data to be download. Download buttons are also available throughtout the portal for the results of a specific query.
+
 ### Query selectors
 
 The top panel of the sidebar contains filtering selectors. 
