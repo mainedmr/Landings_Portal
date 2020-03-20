@@ -359,7 +359,28 @@ shinyServer(function(input, output, session) {
                title = lab_series(), 
                title_offset = 75) %>%
       # Set ggvis options
-      set_options(width = "auto", height = "600", resizable = F)
+      set_options(width = "auto", height = "600", resizable = F) %>%
+      # Popup on hover
+      add_tooltip(function(data) {
+        # Blank HTML
+        html <- ""
+        # For each column in the hovered point
+        for (col in names(data)) {
+          # If it is the reactive col, give it the series name
+          if (grepl('reactive', col)) {
+            colname <-  lab_series()
+          } else { # Column name to title case
+              colname <- stringr::str_to_title(col)
+          }
+          # Get value of hovered point, format it as number if numeric and not
+          val <- unlist(data[col])
+          if (is.numeric(val) & tolower(col) != 'year') {
+            val <- prettyNum(round(val, 0), big.mark = ",", scientific = F)
+          }
+          html <- paste0(html, "<strong>", colname, ": </strong>", val, "</br>")
+        }
+        return(html)
+        }, on = "hover")
   }) %>%
   ## Bind reactive plot to a shiny output
   bind_shiny(plot_id = "plot_time_series", controls_id = "plot_time_series_ui")
@@ -380,7 +401,9 @@ shinyServer(function(input, output, session) {
         fluidRow(
           # Time series plot of landings per year
           ggvisOutput("plot_time_series"),
-          uiOutput("plot_time_series_ui")
+          uiOutput("plot_time_series_ui"),
+          # Plot caption
+          h4("Hover mouse over plot points to see data detail.")
         )
       )
     } else {
