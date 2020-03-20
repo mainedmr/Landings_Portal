@@ -39,21 +39,42 @@ shinyUI(function(req) {
           width = 2,
           ## Selectors
           fluidRow(wellPanel(
-            # Pre-defined queries button
-            dropdownButton(
-              tags$h3("Preset Queries"),
-              selectizeInput("gbl_query", label = "", 
-                 choices = vars_queries,
-                 options = list(placeholder = "Choose query",
-                                'plugins' = list('remove_button'),
-                                onInitialize = I('function() { this.setValue(""); }')
-                 )),
-              circle = T,
-              icon = icon("info-circle"),
-              status = "info",
-              size = "sm",
-              label = "Preset Queries",
-              tooltip = T
+            # Button row
+            fluidRow(
+              column(2,
+                # Pre-defined queries button
+                dropdownButton(
+                  tags$h3("Preset Queries"),
+                  selectizeInput("gbl_query", label = "", 
+                     choices = vars_queries,
+                     options = list(placeholder = "Choose query",
+                                    'plugins' = list('remove_button'),
+                                    onInitialize = I('function() { this.setValue(""); }')
+                     )),
+                  circle = T,
+                  icon = icon("info-circle"),
+                  status = "info",
+                  size = "sm",
+                  label = "Preset Queries",
+                  tooltip = T
+                )
+              ),
+              column(2,
+                dropdownButton(
+                  tags$h3("Batch Download"),
+                  # Download buttons
+                  downloadButton(outputId = "dl_all_mod", 
+                                 label = "Modern Landings"),
+                  downloadButton(outputId = "dl_all_hist", 
+                                 label = "Historic Landings"),
+                  circle = T,
+                  icon = icon("file-download"),
+                  status = "success",
+                  size = "sm",
+                  label = "Batch Download",
+                  tooltip = T
+                )
+              )
             ),
             # Title for selector box
             selectors_title,

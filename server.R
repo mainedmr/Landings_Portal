@@ -175,6 +175,28 @@ shinyServer(function(input, output, session) {
     set_query(query_name = input$gbl_query, session)
   })
   
+  ## React to batch download button presses
+  # Modern landings
+  output$dl_all_mod <- downloadHandler(
+    filename = function() {
+      paste0('MaineDMR_Modern_Landings_Data_', Sys.Date(), '.csv')
+    },
+    content = function(con) {
+      submit_event("download", "all_modern", guid, ip = "ip()")
+      readr::write_csv(landings, con, na = "")
+    }
+  )
+  # Historic landings
+  output$dl_all_hist <- downloadHandler(
+    filename = function() {
+      paste0('MaineDMR_Historic_Landings_Data_', Sys.Date(), '.csv')
+    },
+    content = function(con) {
+      submit_event("download", "all_historic", guid, ip = "ip()")
+      readr::write_csv(hist_landings, con, na = "")
+    }
+  )
+  
   ## React to selector for modern/historic landings
   hist_toggle <- F
   observeEvent(input$gbl_landings_type, {
@@ -347,6 +369,7 @@ shinyServer(function(input, output, session) {
       paste0('MaineDMR_Landings_Time_Series_Data_', Sys.Date(), '.csv')
     },
     content = function(con) {
+      submit_event("download", "time_series", guid, ip = "ip()")
       readr::write_csv(ts_data(), con, na = "")
     }
   )
@@ -514,6 +537,7 @@ shinyServer(function(input, output, session) {
       paste0('MaineDMR_Landings_Grouped_Data_', Sys.Date(), '.csv')
     },
     content = function(con) {
+      submit_event("download", "grouped", guid, ip = "ip()")
       readr::write_csv(gr_data(), con, na = "")
     }
   )
