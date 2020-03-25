@@ -1,7 +1,6 @@
 ### UI for plot controls
 plot_controls_ui <- tags$div(
   div(id = "div_plot_controls",
-      wellPanel(
         h4("Plot/Table Controls"),
         selectizeInput(
           "gbl_landings_type", 
@@ -25,6 +24,5 @@ plot_controls_ui <- tags$div(
           choices = vars_series,
           selected = vars_series[1]
         )
-      ) # End well panel
   ) # End div
 )

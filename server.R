@@ -63,25 +63,6 @@ shinyServer(function(input, output, session) {
     }
   })
   
-  ## Toggle sidebar on/off with button clicks
-  observeEvent(input$sidebar_toggle, {
-    req(input$sidebar_toggle)
-    if (sidebar_state) {
-      shinyjs::hide(id = "div_sidebar")
-      sidebar_state <<- F
-    } else {
-      if (input$tab_panel == "about") {
-        shinyjs::hide(id = "div_sidebar")
-        sidebar_state <<- F
-      } else {
-        shinyjs::show(id = "div_sidebar")
-        sidebar_state <<- T
-      }
-    }
-    # Submit event
-    submit_event("sidebar_state", ifelse(sidebar_state, "on", "off"), guid, ip = "ip()")
-  })
-  
   ## Clear port and species selectors when buttons hit
   observeEvent(input$rst_port, {
     updateSelectizeInput(session, "gbl_ports", selected = character(0))

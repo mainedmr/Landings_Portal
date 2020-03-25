@@ -1,7 +1,6 @@
 ### UI for map controls
 map_controls_ui <- tags$div(
   div(id = "div_map_controls",
-      wellPanel(
         h4("Map Controls"),
         selectizeInput(
           "map_lyr",
@@ -27,6 +26,5 @@ map_controls_ui <- tags$div(
               selected = vars_series[2]
             )
         )
-      ) # End well panel
   ) # End map control div
 )
