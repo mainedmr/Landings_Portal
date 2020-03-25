@@ -76,5 +76,10 @@ vars_hist_series <- vars_series[1:2]
 lab_wt <- glue("Total Weight ({unit_wt})")
 lab_val <- glue("Total Value ({unit_val})")
 
-
+# Source UI subfiles for each tab
+source('tab_ts/tab_ts_ui.R')
+source('tab_gr/tab_gr_ui.R')
+source('tab_map/tab_map_ui.R')
+# Source UI subfiles for controls
+for (ui in list.files('controls_ui', full.names = T)) {source(ui)}
 

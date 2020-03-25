@@ -44,13 +44,7 @@ shinyUI(function(req) {
               column(2,
                 # Pre-defined queries button
                 dropdownButton(
-                  tags$h3("Preset Queries"),
-                  selectizeInput("gbl_query", label = "", 
-                     choices = vars_queries,
-                     options = list(placeholder = "Choose query",
-                                    'plugins' = list('remove_button'),
-                                    onInitialize = I('function() { this.setValue(""); }')
-                     )),
+                  queries_ui,
                   circle = T,
                   icon = icon("info-circle"),
                   status = "info",
@@ -61,12 +55,7 @@ shinyUI(function(req) {
               ),
               column(2,
                 dropdownButton(
-                  tags$h3("Batch Download"),
-                  # Download buttons
-                  downloadButton(outputId = "dl_all_mod", 
-                                 label = "Modern Landings"),
-                  downloadButton(outputId = "dl_all_hist", 
-                                 label = "Historic Landings"),
+                  batch_dl_ui,
                   circle = T,
                   icon = icon("file-download"),
                   status = "success",
@@ -76,118 +65,12 @@ shinyUI(function(req) {
                 )
               )
             ),
-            # Title for selector box
-            selectors_title,
-            ## Port
-            div(id = "div_port",
-              selectizeInput(
-                "gbl_ports", 
-                label = ports_label, 
-                choices = vars_ports,
-                #selected = vars_ports[1],
-                multiple = T,
-                options = list(maxOptions = ports_max_options,
-                               maxItems = ports_max_items,
-                               placeholder = ports_placeholder,
-                               'plugins' = list('remove_button'),
-                               onInitialize = I('function() { this.setValue(""); }')
-                          )
-              ),
-              actionButton(
-                "rst_port",
-                label = "Clear Port Selection"
-              )
-            ),
-            ## Species
-            div(id = "div_species",
-              selectizeInput(
-                "gbl_species",
-                label = species_label,
-                choices = vars_species,
-                #selected = vars_species[1],
-                multiple = T,
-                options = list(maxOptions = species_max_options,
-                               maxItems = species_max_items,
-                               placeholder = species_placeholder,
-                               'plugins' = list('remove_button'),
-                               onInitialize = I('function() { this.setValue(""); }')
-                               )
-              ),
-              actionButton(
-                "rst_species",
-                label = "Clear Species Selection"
-              )
-            ),
-           ## Year range
-            div(id = "div_year",
-              sliderInput(
-                "gbl_year_range", 
-                label = years_label, 
-                min = min(as.numeric(vars_years)), 
-                max = max(as.numeric(vars_years)), 
-                value = c(years_min_year, years_max_year),
-                sep = ""
-              )
-            ) # End div_year
+            filters_ui
           ), # End well panel 
-          # The control panel for the plots
-          div(id = "div_plot_controls",
-              wellPanel(
-                h4("Plot/Table Controls"),
-                selectizeInput(
-                  "gbl_landings_type", 
-                  label = "Landings Type:", 
-                  choices = c("Modern" = "mod", "Historic" = "hist")
-                ),
-                selectizeInput(
-                  "gbl_plot_tbl", 
-                  label = "Display Type:", 
-                  choices = c("Plot" = "plot", "Table" = "table")
-                ),
-                selectizeInput(
-                  "gbl_group_plots",
-                  label = "Group by:",
-                  choices = vars_groups,
-                  selected = "none"
-                ),
-                selectizeInput(
-                  "gbl_plot_series",
-                  label = "Plot Series:",
-                  choices = vars_series,
-                  selected = vars_series[1]
-                )
-              ) # End well panel
-            ), # End plot control div
+        # The control panel for the plots
+        plot_controls_ui,
         # The control panel for the map
-        div(id = "div_map_controls",
-            wellPanel(
-              h4("Map Controls"),
-              selectizeInput(
-                "map_lyr",
-                label = "Map by:",
-                choices = vars_map_lyrs,
-                selected = vars_map_lyrs[1]
-              ),
-              selectizeInput(
-                "map_color_by",
-                label = "Color by:",
-                choices = vars_series,
-                selected = vars_series[1]
-              ),
-              selectInput("map_color_scheme", 
-                label = "Color Scheme:",
-                choices = rownames(subset(brewer.pal.info, category %in% c("seq", "div"))),
-                selected = "YlOrBr"),
-              div(id = "div_size_by",
-                selectizeInput(
-                  "map_size_by",
-                  label = "Size Points by:",
-                  choices = vars_series,
-                  selected = vars_series[2]
-                )
-              )
-            ) # End well panel
-          ) # End map control div
+        map_controls_ui
         ) # End fluid row
       ) # End sidebar panel
     ), # End sidebar div
@@ -208,42 +91,19 @@ shinyUI(function(req) {
         ## Time Series panel
         ## -------------------------------------------------------------------------
         tabPanel(h4("Time Series"), value = "ts",
-          div(id = "div_ts",
-            fluidRow(
-              # Title is generated dynamically
-              uiOutput("plot_time_series_title"),
-              column(6, align = "center", offset = 3,
-                # Button to download the data
-                downloadButton("dl_ts", "Download selected data (CSV)")
-              )
-            ),
-            uiOutput("ts_page")
-          )
+          tab_ts_ui
         ),
         ## -------------------------------------------------------------------------
         ## Grouped variable panel
         ## -------------------------------------------------------------------------
         tabPanel(h4("Grouped Variable"), value = "group",
-          div(id = "div_gr",
-            fluidRow(
-              # Title is generated dynamically
-              uiOutput("plot_gr_title")
-            ),
-            uiOutput("grouped_page")
-          )
+          tab_gr_ui
         ),
         ## -------------------------------------------------------------------------
         ## Map panel
         ## -------------------------------------------------------------------------
         tabPanel(h4("Map"), value = "map",
-           div(id = "div_map",
-               # Title is generated dynamically
-               fluidRow(uiOutput("map_title")),
-               # The leaflet map
-               leafletOutput(
-                 "map", width = "100%", height = "800px"
-               )
-           )
+           tab_map_ui
         )
       ) # End tabset panel
     ) # End main panel
