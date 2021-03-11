@@ -2,6 +2,42 @@
 
 queries <- list(
   # Plot yearly lobster landings per zone
+  lob_per_port = list(
+    description = "Table of Lobster Landings Per Port 2010-2019",
+    tab = "group",
+    selections = list(
+      # Set landings type first, since other selectors clear when it is toggled
+      gbl_landings_type = list(
+        type = "selectize",
+        selected = "mod"
+      ),
+      gbl_ports = list(
+        type = "selectize",
+        selected = character(0)
+      ),
+      gbl_species = list(
+        type = "selectize",
+        selected = c("Lobster American")
+      ),
+      gbl_year_range = list(
+        type = "slider",
+        value = c(2010, 2019)
+      ),
+      gbl_plot_tbl = list(
+        type = "selectize",
+        selected = "table"
+      ),
+      gbl_group_plots = list(
+        type = "selectize",
+        selected = "port"
+      ),
+      gbl_plot_series = list(
+        type = "selectize",
+        selected = "total_weight"
+      )
+    )
+  ),
+  # Plot yearly lobster landings per zone
   lob_per_zone = list(
     description = "Plot Yearly Lobster Landings Per Zone",
     tab = "ts",
