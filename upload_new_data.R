@@ -10,11 +10,18 @@ if (rstudioapi::isAvailable()) {
 
 
 # Input CSV file
-input_csv <- "landings_update_03_04_2020.csv"
+input_csv <- "landings_update_03_24_2021.csv"
 
 # Check that all columns for portal are included
 req_cols <- c("year", "species", "port", "county", "lob_zone", 
               "weight", "weight_type", "value", "trip_n", "harv_n")
+
+# Load in last update for comparison
+load('landings.Rda')
+last_landings <- landings %>%
+  rename(lst_weight = weight, lst_value = value, lst_trip_n = trip_n,
+         lst_harv_n = harv_n)
+last_hist_landings <- hist_landings
 
 # Load data
 landings <- readr::read_csv(input_csv) %>%
@@ -70,6 +77,18 @@ if (class(hist_landings$value) == 'character') {
   # Replace $ , then convert to numeric
   hist_landings$value <- as.numeric(gsub("[\\$,]", "", hist_landings$value))
 }
+
+# Compare to last update
+last_rows <- nrow(last_landings)
+compare <- landings %>%
+  inner_join(last_landings, by = c('year', 'species', 'port', 'county',
+                                   'lob_zone', 'weight_type'))
+
+compare %>% 
+  filter(weight != lst_weight || value != lst_value || trip_n != lst_trip_n
+         || harv_n != lst_harv_n)
+
+
 
 # Save file
 save(landings, hist_landings, file = "landings.Rda")
