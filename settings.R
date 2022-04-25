@@ -34,7 +34,7 @@ years_label = h4("Years:")
 # The default selected min and max for the years selector. The range of the
 # selector will automatically be set to the min/max years present in the data
 years_min_year = 2000
-years_max_year = 2020
+years_max_year = 2021
 
 years_hist_min_year = 1950
 
