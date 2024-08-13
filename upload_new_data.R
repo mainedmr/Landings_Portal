@@ -10,7 +10,7 @@ if (rstudioapi::isAvailable()) {
 
 
 # Input CSV file
-input_csv <- "landings_update_03_24_2021.csv"
+input_csv <- "LandingsDataByPort_8-12-2024.csv"
 
 # Check that all columns for portal are included
 req_cols <- c("year", "species", "port", "county", "lob_zone", 
@@ -78,19 +78,46 @@ if (class(hist_landings$value) == 'character') {
   hist_landings$value <- as.numeric(gsub("[\\$,]", "", hist_landings$value))
 }
 
+# Check for duplicate values
+landings %>%
+  group_by(year, species, port, lob_zone) %>%
+  summarize(n = n()) %>%
+  ungroup() %>%
+  dplyr::filter(n > 1) %>%
+  arrange(desc(year))
+
+# Bin landings by grouping unit
+landings_no_dups <- landings %>%
+  group_by(year, species, port, county, lob_zone, weight_type) %>%
+  summarize(weight = sum(weight, na.rm = T),
+            value = sum(value, na.rm = T),
+            trip_n = sum(trip_n, na.rm = T),
+            harv_n = sum(harv_n, na.rm = T)) %>%
+  ungroup()
+
+last_landings_no_dups <- last_landings %>%
+  group_by(year, species, port, county, lob_zone, weight_type) %>%
+  summarize(lst_weight = sum(lst_weight, na.rm = T),
+            lst_value = sum(lst_value, na.rm = T),
+            lst_trip_n = sum(lst_trip_n, na.rm = T),
+            lst_harv_n = sum(lst_harv_n, na.rm = T)) %>%
+  ungroup()
+
+
 # Compare to last update
-last_rows <- nrow(last_landings)
-compare <- landings %>%
-  inner_join(last_landings, by = c('year', 'species', 'port', 'county',
+last_rows <- nrow(last_landings_no_dups)
+compare <- landings_no_dups %>%
+  inner_join(last_landings_no_dups, by = c('year', 'species', 'port', 'county',
                                    'lob_zone', 'weight_type'))
 
-compare %>% 
-  filter(weight != lst_weight || value != lst_value || trip_n != lst_trip_n
-         || harv_n != lst_harv_n)
+compare_no_match <- compare %>% 
+  dplyr::filter(weight != lst_weight | value != lst_value | trip_n != lst_trip_n
+         | harv_n != lst_harv_n)
 
 
 
 # Save file
+landings <- landings_no_dups
 save(landings, hist_landings, file = "landings.Rda")
 
 # Then upload the output landings.Rda file to the GitHub repo; for convenience,
