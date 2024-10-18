@@ -1,5 +1,7 @@
 ## Function to make a DMR Leaflet basemap - world imagery, world oceans, nautical
 ## charts
+chart_url <- 'https://gis.charttools.noaa.gov/arcgis/rest/services/MarineChart_Services/NOAACharts/MapServer'
+
 get_leaflet_base <- function(view = c(44, -69, 8)) {
   m <- renderLeaflet({
     # Make the map
@@ -13,9 +15,7 @@ get_leaflet_base <- function(view = c(44, -69, 8)) {
                        options = providerTileOptions(noWrap = T),
                        group = "ESRI World Oceans") %>%
       # NOAA RNC
-      addEsriImageMapLayer(url = "https://seamlessrnc.nauticalcharts.noaa.gov/arcgis/rest/services/RNC/NOAA_RNC/ImageServer",
-                           layerId = "chart",
-                           group = "NOAA Chart Service") %>%
+      addEsriTiledMapLayer(url = chart_url, group = 'NOAA Chart Service') %>%
       # Baselayer control
       addLayersControl(
         position = "topleft",
