@@ -238,13 +238,17 @@ shinyServer(function(input, output, session) {
   ## -------------------------------------------------------------------------
   # Render about panel from file
   output$about_page <- renderUI({
+    # Create a temporary file to store the downloaded content
+    temp_file <- tempfile()
+    # Download the file from the URL
+    download.file(about_file_path, temp_file)
     # For Markdown files
     if (endsWith(about_file_path, ".md")) {
-      return(includeMarkdown(about_file_path))
+      return(includeMarkdown(temp_file))
     }
     # For HTML files
     if (endsWith(about_file_path, ".html")) {
-      return(includeHTML(about_file_path))
+      return(includeHTML(temp_file))
     }
     else {
       h5("Could not load about file...")
