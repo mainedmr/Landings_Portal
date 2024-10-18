@@ -5,33 +5,25 @@ library(shinydashboard)
 library(shinydashboardPlus)
 
 shinyUI(function(req) {
- dashboardPagePlus(
-   tagList(
-     # Turn on shinyjs
-     shinyjs::useShinyjs(),
-     # Turn on shiny alert
-     useShinyalert(),
-     # If using Google Analytics
-     #tags$head(includeScript('www/google-analytics.js')),
-     ## Geolocation
-     tags$head(
-       # Load geolocation JS
-       tags$script(src = 'geolocation.js')
-     ),
-     # https://github.com/rstudio/shiny/issues/141
-     div(style = 'display: none;',
-         textInput('remote_addr', 'remote_addr',
-                   if (!is.null(req[['HTTP_X_FORWARDED_FOR']]))
-                     req[['HTTP_X_FORWARDED_FOR']]
-                   else
-                     req[['REMOTE_ADDR']]
-         )
-     )
+  tagList(
+    # Turn on shinyjs
+    shinyjs::useShinyjs(),
+    # If using Google Analytics
+    #tags$head(includeScript('www/google-analytics.js')),
+    ## Geolocation
+    tags$head(
+      # Load geolocation JS
+      tags$script(src = 'geolocation.js')
     ),
-    header = dashboardHeaderPlus(
+    # https://github.com/rstudio/shiny/issues/141
+    
+  )
+ dashboardPage(
+   
+    header = dashboardHeader(
       title = app_title,
       fixed = T,
-      left_menu = tagList(
+      leftUi = tagList(
         dropdownBlock(
           id = 'dd_filters',
           title = 'Filters',
