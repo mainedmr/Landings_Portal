@@ -27,6 +27,7 @@ shinyServer(function(input, output, session) {
   sidebar_state <- F
   # Session-wide boolean for map bumped
   map_bumped <- F
+  plot_bumped <- F
   # React when tab is changed
   observeEvent(input$tab_panel, {
     submit_event("tab_change", input$tab_panel, guid, ip = "ip()")
@@ -60,6 +61,15 @@ shinyServer(function(input, output, session) {
     } else {
       shinyjs::show("div_sidebar")
       sidebar_state <<- T
+    }
+    # Bump plot/table view
+    if (!(input$tab_panel %in% c('about', 'map')) & !plot_bumped) {
+      updateSelectizeInput(session, "gbl_plot_tbl", selected = 'plot')
+      updateSelectizeInput(session, "gbl_plot_tbl", selected = 'table')
+      updateSelectizeInput(session, "gbl_plot_tbl", selected = 'plot')
+      updateSelectizeInput(session, "gbl_plot_tbl", selected = 'table')
+      updateSelectizeInput(session, "gbl_plot_tbl", selected = 'plot')
+      plot_bumped <<- T
     }
   })
   
