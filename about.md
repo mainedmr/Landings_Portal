@@ -2,7 +2,7 @@
 
 Welcome to the state of Maine Department of Marine Resources Landings Data Portal. This application presents non-confidential landings per year, species, and port in various graphical and tabular formats.
 
-Last updated August 13, 2024 with landings data through the end of 2023.
+Last updated April 29th, 2025 with landings data through the end of 2024.
 
 # Caveats/Data Limitations
 
